@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package virtualpet;
+import java.util.*;
 import java.util.Scanner;
 /**
  *
@@ -21,6 +22,8 @@ public class VirtualPet {
  String menuOption = "";
  String menu = "";
  String petChoice = "";
+ String username = "";
+ String password = "";
  
         // TODO code application logic here
 //ASCII art and welcome message
@@ -30,6 +33,27 @@ System.out.println("  ( oo )");
 System.out.println("  \\__/ ");
 System.out.println("Welcome to Furry Wonderland!");
 
+//login system
+System.out.println("Please login to the system.");
+System.out.print("User: ");
+username = scanner.next();
+//if statement to check if the username is valid.
+if(username.equals("snoopy")){
+    System.out.print("Password: ");
+    password = scanner.next();
+    //if statement to check if the password is valid.
+    if(password.equals("toto")){
+        System.out.println("You are allowed to enter!");
+    }
+    else{
+        System.out.println("Invalid password.");
+        System.exit(0);
+    }
+}
+else{
+    System.out.println("Invalid username.");
+    System.exit(0);
+}
 //Menu
 System.out.println("MENU");
 System.out.println("1. Start");
@@ -56,7 +80,7 @@ switch (menuOption){
         System.exit(0);
         break;
     case "1":
-        //Ensure that both the number and word "start" gives the same option
+        //Ensure that both the number and word "start" give the same option
         menu = "Start";
         System.out.println("Choose a pet from this list: \nRabbit, Pegasus, Koala ");
         petChoice = scanner.next();
