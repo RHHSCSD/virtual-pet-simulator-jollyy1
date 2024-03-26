@@ -5,6 +5,7 @@
 package virtualpet;
 import java.util.*;
 import java.util.Scanner;
+import java.util.Random;
 /**
  *
  * @author michael.roy-diclemen
@@ -22,8 +23,20 @@ public class VirtualPet {
  String menuOption = "";
  String menu = "";
  String petChoice = "";
- String username = "";
- String password = "";
+ final String USERNAME = "snoopy";
+ final String PASSWORD = "toto";
+ int petNameOption = 0;
+ String user = "";
+ String passwordEntry = "";
+ String petName = "";
+ final String VOWELS = "aeiou";
+ final String CONSONANTS = "bcdfghjklmnpqrstvwxyz";
+ int nameLength = 0;
+ String nameLetters = "";
+ int petStats = 0;
+ int maxHealth = 0;
+ int maxFood = 0;
+ int maxEnergy = 0;
  
         // TODO code application logic here
 //ASCII art and welcome message
@@ -36,17 +49,17 @@ System.out.println("Welcome to Furry Wonderland!");
 //login system
 System.out.println("Please login to the system.");
 System.out.print("User: ");
-username = scanner.next();
+user = scanner.next();
 //if statement to check if the username is valid.
-if(username.equals("snoopy")){
-    System.out.print("Password: ");
-    password = scanner.next();
+if(user.equals(USERNAME)){
+    System.out.print("Password: "); //if the username is valid, give the password prompt
+    passwordEntry = scanner.next();
     //if statement to check if the password is valid.
-    if(password.equals("toto")){
+    if(passwordEntry.equals(PASSWORD)){
         System.out.println("You are allowed to enter!");
     }
     else{
-        System.out.println("Invalid password.");
+        System.out.println("Invalid password."); //if password is not valid, exit the system
         System.exit(0);
     }
 }
@@ -65,37 +78,52 @@ menuOption = scanner.next();
 switch (menuOption){
     //allow the user to choose from the given list
     case "start": 
+    case "1": //ensure that both the number and word "start" give the same option
         menu = "Start";
         System.out.println("Choose a pet from this list: \n Rabbit, Pegasus, Koala ");
         petChoice = scanner.next();
         System.out.println("The pet that you chose was: " + petChoice);
+        System.out.print("It is time to name your pet. Please select 1 to type your pet's name or 2 to have the system generate a random name. ");
+        petNameOption = scanner.nextInt();
+        if(petNameOption == 1){ //if the user selected 1, prompt them to enter a name.
+            System.out.print("Please enter a name for your pet: ");
+            petName = scanner.next();
+            System.out.print("Your pet, named " + petName + ", has been born!"); //output pet name
+        }
+        else if(petNameOption == 2){
+            Random r = new Random();
+           nameLength = (r.nextInt(5)+4); //generate a random name length between 4 and 8 characters. 0-5 without 5 being inclusive and then adding 4 to the number to give an output of between 4 and 8.
+           for (int i = 4; i < nameLength; i = i + 2){
+              if (i%2 == 0){ //if i is even, add a vowel
+                  nameLetters += (char)(r.nextInt(VOWELS));
+              }
+              else{ //if i is odd, add a consonant
+                  
+              }
+                nameLetters += (char)(r.nextInt(CONSONANTS));
+        }
+        //part 5 - give stats to the pet
+        petStats = (r.nextInt(10)+11); //generate a random total length between 10 and 20
+        maxHealth = (petStats - r.nextInt(10)+11);
+        maxFood = (petStats - maxHealth - r.nextInt(10)+11);
+        maxEnergy = petStats - maxHealth - maxFood;
+        System.out.print(petStats + ", " + maxHealth + ", " + maxFood + ", " + maxEnergy);
+        }
         break;
     case "intructions":
+    case "2": 
         menu = "Instructions";
         break;
     //when the user inputs exit, or the number 3, exit the program and output an exit message.
     case "exit":
+    case "3": 
         menu = "Exit";
         System.out.println("You have exited Furry Wonderland.");
         System.exit(0);
         break;
-    case "1":
-        //Ensure that both the number and word "start" give the same option
-        menu = "Start";
-        System.out.println("Choose a pet from this list: \nRabbit, Pegasus, Koala ");
-        petChoice = scanner.next();
-        System.out.println("The pet that you chose was: " + petChoice);
-        break;
-    case "2":
-        menu = "Instructions";
-        break;
-    case "3":
-        menu = "Exit";
-        System.out.println("You have exited Furry Wonderland.");
-        System.exit(0);
-        break; 
     default: 
         System.out.println("Invalid entry");
+        System.exit(0);
         break;
 
 
