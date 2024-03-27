@@ -37,6 +37,7 @@ public class VirtualPet {
  int maxHealth = 0;
  int maxFood = 0;
  int maxEnergy = 0;
+ Random r = new Random();
  
         // TODO code application logic here
 //ASCII art and welcome message
@@ -91,25 +92,36 @@ switch (menuOption){
             System.out.print("Your pet, named " + petName + ", has been born!"); //output pet name
         }
         else if(petNameOption == 2){
-            Random r = new Random();
            nameLength = (r.nextInt(5)+4); //generate a random name length between 4 and 8 characters. 0-5 without 5 being inclusive and then adding 4 to the number to give an output of between 4 and 8.
-           for (int i = 4; i < nameLength; i = i + 2){
+           for (int i = 0; i < nameLength; i = i + 1){
               if (i%2 == 0){ //if i is even, add a vowel
-                  nameLetters += (char)(r.nextInt(VOWELS));
+                  int randomIndexOne = (r.nextInt(VOWELS.length())); //deteremines the total length of the string
+                  nameLetters = nameLetters + (VOWELS.charAt(randomIndexOne)); //concactenates the variable nameLetters with a random character determined by the random index from the previous line
               }
               else{ //if i is odd, add a consonant
-                  
+                  int randomIndexTwo = (r.nextInt(CONSONANTS.length())); //repeat same process with vowels with consonants
+                  nameLetters = nameLetters + (CONSONANTS.charAt(randomIndexTwo));    
               }
-                nameLetters += (char)(r.nextInt(CONSONANTS));
-        }
+           }
+           System.out.print("Your pet, named " + nameLetters + ", has been born!"); //output the name of the pet.
+
+        }          
         //part 5 - give stats to the pet
-        petStats = (r.nextInt(10)+11); //generate a random total length between 10 and 20
-        maxHealth = (petStats - r.nextInt(10)+11);
-        maxFood = (petStats - maxHealth - r.nextInt(10)+11);
-        maxEnergy = petStats - maxHealth - maxFood;
-        System.out.print(petStats + ", " + maxHealth + ", " + maxFood + ", " + maxEnergy);
-        }
+        petStats = (r.nextInt(11)+10); //generate a random total length between 10 and 20
+        //generate random values between 1 and 10 for each stat
+        maxHealth = r.nextInt(10)+1;
+        maxFood = r.nextInt(10)+1;
+        maxEnergy = r.nextInt(10)+1;
+        //make sure that the sum of all three do not exceed pet stats 
+        if (maxHealth + maxFood + maxEnergy > petStats){
+            maxHealth = Math.min(maxHealth, petStats - 2);
+            maxFood = Math.min(maxFood, petStats - maxHealth - 1); //make sure that (at least) two points are available for the other two stats
+            maxEnergy = Math.min(maxEnergy, petStats - maxHealth - maxFood); //make sure that (at least) one point is available for the other stat
+        }//output results
+        System.out.println("\nMAX HEALTH: " + maxHealth + ", MAX FOOD: " + maxFood + ", MAX ENERGY:  " + maxEnergy);
+        
         break;
+  
     case "intructions":
     case "2": 
         menu = "Instructions";
