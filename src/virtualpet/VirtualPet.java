@@ -6,61 +6,151 @@ package virtualpet;
 import java.util.*;
 import java.util.Scanner;
 import java.util.Random;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author michael.roy-diclemen
  */
 
 public class VirtualPet {
-final int MAX_GUESSES = 10; //max 10 guesses
 
 
     /**
      * @param args the command line arguments
      */
-public static void numberGuessingGame(){
+public static int numberGuessingGame(){
+    int score = 100; //this is the initial score that the user starts with
     Scanner scanner = new Scanner(System.in);
     Random r = new Random();
-    System.out.println("Number Guessing Game: \n The objective is to guess the randomly generated numbe tbetween 1 and 100.");
+    System.out.println("Number Guessing Game: \n The objective is to guess the randomly generated number between 1 and 100.");
      int numberOfAttempts = 5;
      for (int attempts = 1; attempts <= numberOfAttempts; attempts++){
         int randomNumber = r.nextInt(100)+1; //1-100 (not inclusive of 100 but adding one will make the range up to 100)
-        int score = 100; //this is the initial score that the user starts with
         System.out.print("Please guess a number between 1 and 100: ");
         int guess = scanner.nextInt();
         if (guess>randomNumber){ //when the number guessed is greater than the generated
-            System.out.print("Too high");
+            System.out.print("\nToo high");
 } //end of if guess
         else if (guess<randomNumber){ //when the number guessed is too low
-            System.out.print("Too low");
+            System.out.print("\nToo low");
         } //end of else if guess
         else{ //when the number guessed is the same
-            System.out.print("Correct");
+            System.out.print("\nCorrect");
             break; // if the guess is correct, then exit the loop
      } //end of else guess
         score -= 20; //minus 20 points for each attempt
 
      if (score <=0){
-         System.out.println("You have run out of guesses.");
+         System.out.println("\nYou have run out of guesses. The correct number is: " + randomNumber);
      } //end of if score 
-     System.out.println("Your final score was: " + score);
-
              } //end of for numberOfAttempts
+     System.out.println("\nYour final score was: " + score);
+     return score*10; //one point is 10 dollars
 } //end of method for game 1
 
-public static void matchingGame(){
-    System.out.println("Matching Game: \n The objective of this game is to find the pairs in the string.");
-    String letters = letters(); //generate the random letters
-    String revealedLetters = hideLetters(letters); //hide the letters
-    int score = 0;
-    int guesses = 0;
-    
-    while (guesses < MAX_GUESSES && !matchedPairs(revealed)){
-        System.out.
-        
-    } //end of while matched pairs
-} //end of method for game 2
-public static void main(String[] args) {    
+
+
+    public static String shuffle(String s)
+    {
+
+        String shuffledString = "";
+        Random rn = new Random(); // create a Random object
+        while (s.length() != 0)
+        {
+            int index = rn.nextInt(s.length());
+            char c = s.charAt(index);
+            s = s.substring(0,index)+s.substring(index+1);
+            shuffledString += c;
+        }
+
+        return shuffledString;
+    }
+   
+   
+    public static String replaceCharAt(String s, int pos, char c){ //replace a character at a specific position(idex) in a string
+        return s.substring(0, pos) + c + s.substring(pos + 1);
+    }
+   
+       
+    public static int matchingGame(){
+        final int NUM_PAIRS = 5;
+        final int MAX_GUESS = 7; //number of guesses expires.
+        final int EARNING_CORRECT_MATCH = 10; //player earns $10 for each correct match
+        final int EARNING_INCORRECT_MATCH = -2; //player loses $2 for each incorrect match
+        int earnedMoney = 0;
+        // 1. Initialization
+        // Generate a single string containing 10 pairs of letters
+        Random rn = new Random(); // Create a Random object
+        String orginalString =""; //the original string containing the 10 pairs of letters
+        for (int i =0; i<NUM_PAIRS; i++){
+           char letter = (char)(rn.nextInt(26)+97); //generated a random lower-case character
+           orginalString = orginalString + letter + letter; //append the letter twice as a pair
+        }
+        String shuffledString = shuffle(orginalString);
+        //System.out.println("Original String: " + orginalString);
+        //System.out.println("Shuffled String: " + shuffledString);
+        String revealedString = "**********"; //5 pairs of *
+       
+        // 2. Game play; and 3. Scoring
+        System.out.println(revealedString);
+        //create a Scanner object for input, use the ',' and \n as the delimiter between two positions (index) in the input
+        Scanner keyboard = new Scanner(System.in).useDelimiter(Pattern.compile("[\\n,]"));
+                                       
+        int pos1=0; //the first position(index) in the string for the pair of letters to guess
+        int pos2=0; //the second position(index) in the string for the pair of letters to guess
+        int numGuess = 0; // total number of guesses
+        int numCorrectGuess = 0; //number of correct guess, when it reaches 10, all pairs are matched(guessed) correctly        
+        while ((numGuess<MAX_GUESS)&&(numCorrectGuess<NUM_PAIRS)){// 4. End Condition: all pairs are matched or the max number of guesses is reached
+            Boolean matched = true;
+            while (matched){ //(loop) Keep asking player to guess until the letters to guess have not be successfully matched previously
+                System.out.print("Guess: ");
+                pos1 = keyboard.nextInt(); //get the first position
+                pos2 = keyboard.nextInt(); //get the second position
+                if ((pos1<revealedString.length())&& (pos2<revealedString.length())){
+                    if ((revealedString.charAt(pos1)=='*') && (revealedString.charAt(pos2)=='*')) {//the letter (to guess) has not been successfully matched previuously
+                        matched = false;
+                    }
+                    else {
+                        System.out.println("The letters have already been successfully matched, please guess a new pair!");
+                    }
+                }
+                else{
+                    System.out.println("the position (index) is out of bound.");
+                }
+            }
+            if (shuffledString.charAt(pos1) == shuffledString.charAt(pos2)){ //two positions match
+                //reveal the two matched letters
+                revealedString = replaceCharAt(revealedString, pos1, shuffledString.charAt(pos1)); //reveal the first matched letter
+                revealedString = replaceCharAt(revealedString, pos2, shuffledString.charAt(pos2)); //reveal the second matched letter
+                System.out.println(revealedString);
+                System.out.println("Shuffled String: " + shuffledString);
+                numCorrectGuess += 1;
+                earnedMoney += EARNING_CORRECT_MATCH; // player earn $10 for each correct match
+                System.out.println("earning: " + earnedMoney);
+            }
+            else{
+                System.out.println("Your guess doesn't match! \n");
+                System.out.println("Shuffled String: " + shuffledString);
+                earnedMoney += EARNING_INCORRECT_MATCH; // player loses $2 for each incorrect match
+                System.out.println("earning: " + earnedMoney);
+            }
+           
+            numGuess += 1;
+       
+        } // end of while
+       
+        //display the player's score and the number of guesses made.
+        System.out.println("The score: " + earnedMoney);
+        System.out.println("Number of guesses made: " + numGuess);
+       
+        keyboard.close();
+        return earnedMoney;
+       
+    }
+public static void main(String[] args) {  
+    Scanner scanner = new Scanner(System.in);
+    Random r = new Random();
     //Variables and constants
     String menuOption = "";
     String menu = "";
@@ -81,6 +171,7 @@ public static void main(String[] args) {
     int maxEnergy = 0;
     int maxTries = 3;
     int randomNumber = 0;
+    int money = 0;
  
     // TODO code application logic here
     //ASCII art and welcome message
@@ -178,7 +269,9 @@ if (allow == 0){ //run when the valid password and username
             switch (displayOption){
                 case "1":
                 case "play":
-                    numberGuessingGame();
+                    money += numberGuessingGame();
+                    money += matchingGame();
+                    System.out.print("The total money earned is: " + money);
             } //end of switch displayOption
 
         case "intructions":
