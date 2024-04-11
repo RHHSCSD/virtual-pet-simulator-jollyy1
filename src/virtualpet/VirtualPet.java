@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.Scanner;
 import java.util.Random;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -148,6 +150,51 @@ public static int numberGuessingGame(){
         return earnedMoney;
        
     }
+
+public static double playingPet(){
+    //playing with your pet
+    System.out.println("Buy your pet a toy!");
+    money = money - 1; //subtract money used to buy the toy
+    maxEnergy = maxEnergy + 1; //increase the energy by 1 by buying pet a new toy
+    System.out.println("Energy increased to " + maxEnergy);
+    
+    
+    
+} //end of playingPet method
+public static double feedPet(){
+    //feeding pet
+    System.out.println("Feed your pet!");
+    money = money - 1;
+    maxFood = maxFood + 2; // increase the food given to pet
+    System.out.println("Food increased to " + maxFood + ". They are less hungry now.");
+
+    
+} //end of feedPet method
+
+public static double groomPet(){
+    //grooming pet
+    System.out.println("Groom your pet!");
+    money = money - 1;
+    maxHealth = maxHealth + 2; //increase the max health 
+    System.out.println("Health increased! Max health increased to: " + maxHealth);
+    
+} //end of groomPet
+public static int petStatistics(){
+ Random r = new Random();
+ int petStats = (r.nextInt(11)+10); //generate a random total length between 10 and 20
+            //generate random values between 1 and 10 for each stat
+            int maxHealth = r.nextInt(10)+1;
+            int maxFood = r.nextInt(10)+1;
+            int maxEnergy = r.nextInt(10)+1;
+            //make sure that the sum of all three do not exceed pet stats 
+            if (maxHealth + maxFood + maxEnergy > petStats){
+                maxHealth = Math.min(maxHealth, petStats - 2);
+                maxFood = Math.min(maxFood, petStats - maxHealth - 1); //make sure that (at least) two points are available for the other two stats
+                maxEnergy = Math.min(maxEnergy, petStats - maxHealth - maxFood); //make sure that (at least) one point is available for the other stat
+            }//output results
+            System.out.println("\nMAX HEALTH: " + maxHealth + ", MAX FOOD: " + maxFood + ", MAX ENERGY:  " + maxEnergy); 
+}
+public class InputDialogBox {
 public static void main(String[] args) {  
     Scanner scanner = new Scanner(System.in);
     Random r = new Random();
@@ -165,10 +212,6 @@ public static void main(String[] args) {
     final String CONSONANTS = "bcdfghjklmnpqrstvwxyz";
     int nameLength = 0;
     String nameLetters = "";
-    int petStats = 0;
-    int maxHealth = 0;
-    int maxFood = 0;
-    int maxEnergy = 0;
     int maxTries = 3;
     int randomNumber = 0;
     int money = 0;
@@ -182,7 +225,7 @@ public static void main(String[] args) {
     System.out.println("Welcome to Furry Wonderland!");
 
     //login system
-    System.out.println("Please login to the system.");
+    String input = JOptionPane.showInputDialog("What is the username? ");
     int allow = 1;
     int i = 1;
     while (allow == 1 && i <= maxTries){
@@ -247,18 +290,7 @@ if (allow == 0){ //run when the valid password and username
                System.out.print("Your pet, named " + nameLetters + ", has been born!"); //output the name of the pet.
             }          
             //part 5 - give stats to the pet
-            petStats = (r.nextInt(11)+10); //generate a random total length between 10 and 20
-            //generate random values between 1 and 10 for each stat
-            maxHealth = r.nextInt(10)+1;
-            maxFood = r.nextInt(10)+1;
-            maxEnergy = r.nextInt(10)+1;
-            //make sure that the sum of all three do not exceed pet stats 
-            if (maxHealth + maxFood + maxEnergy > petStats){
-                maxHealth = Math.min(maxHealth, petStats - 2);
-                maxFood = Math.min(maxFood, petStats - maxHealth - 1); //make sure that (at least) two points are available for the other two stats
-                maxEnergy = Math.min(maxEnergy, petStats - maxHealth - maxFood); //make sure that (at least) one point is available for the other stat
-            }//output results
-            System.out.println("\nMAX HEALTH: " + maxHealth + ", MAX FOOD: " + maxFood + ", MAX ENERGY:  " + maxEnergy);        
+            petStatistics(); 
             //second display menu
             exit = 0;
             System.out.println("1. Play/Interaction");
@@ -294,4 +326,5 @@ if (allow == 0){ //run when the valid password and username
     } // end of while exit
 } //end of if allow
 } //end of main
+} //end of input dialog box
 } //end of class
