@@ -3,7 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package virtualpet;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -12,7 +15,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author michael.roy-diclemen
+ * @author jolly yan
  */
 
 public class VirtualPet {
@@ -21,8 +24,8 @@ public class VirtualPet {
     static int[] actions = new int[3];
     static int money = 100; //give $100 to start
     static String petChoice = "";
-    static final String USERNAME = "snoopy";
-    static final String PASSWORD = "toto";
+    //static final String USERNAME = "snoopy";
+    //static final String PASSWORD = "toto";
     static int petNameOption = 0;
     static String user = "";
     static String passwordEntry = "";
@@ -32,7 +35,6 @@ public class VirtualPet {
     static int nameLength = 0;
     static String nameLetters = "";
     static final int MAX_TRIES = 3;
-    static int randomNumber = 0;
     static Scanner scanner = new Scanner(System.in);
     
     public static void startGame(){
@@ -79,26 +81,37 @@ public class VirtualPet {
 
     //login system
     public static boolean loginSystem(){
-        for (int i = 0; i < MAX_TRIES; i++){
-        user = JOptionPane.showInputDialog("Username: ");
-            //if statement to check if the username is valid.
-            if(user.equals(USERNAME)){
-                passwordEntry = JOptionPane.showInputDialog("Password: "); //if the username is valid, give the password prompt
-                //if statement to check if the password is valid.
-                if(passwordEntry.equals(PASSWORD)){
-                    System.out.println("You are allowed to enter!");
-                    return true;
+        boolean loginOK = false;
+        user = JOptionPane.showInputDialog("Username: "); 
+        File f = new File(user + ".txt");
+        Scanner input = null;
+        String password = "";
+        if (f.exists()){ //existing user
+            try{
+                input = new Scanner(f);
+                password = input.nextLine();
+            }
+            catch(IOException e){
+                System.out.println("There is an issue with reading the file.");
+            }
+            if(input!=null){input.close();}
+            
+            int i =0;
+            while ((!loginOK) && (i < MAX_TRIES)){
+                passwordEntry = JOptionPane.showInputDialog("Password: "); 
+                if (passwordEntry.equals(password)){
+                        loginOK = true;
                 }
                 else{
-                    System.out.println("Invalid password."); //if password is not valid, exit the system
+                   System.out.println("The password is wrong. try again"); 
                 }
-            }
-            else{
-                System.out.println("Invalid username.");
-            }
-
-        } //end of for
-        return false;
+            } //end of while
+        }
+        else { //file doesn't exit, new user
+            passwordEntry = JOptionPane.showInputDialog("Password: "); 
+            loginOK= true;
+        }
+        return loginOK;
     }
 
     public static void mainMenu(){   
@@ -133,18 +146,29 @@ public class VirtualPet {
                             System.out.print("The total money earned is: " + money);
                             petStatistics(); // initialize the pet stats
                             interactions();
-                            if (money>0){
-                                maxStats[2] = playingPet(); // playing pet
-                                maxStats[1] = feedPet(); //feed Pet
-                                maxStats[0] = groomPet(); // groomPet
-                                displayActions();
+                            displayActions();
+                            PrintWriter output = null;
+                            try{
+                                FileWriter petSimulator = new FileWriter(user + ".txt");
+                                output = new PrintWriter(petSimulator);
+                                output.println(passwordEntry);
+                                output.println(petChoice);
+                                for (int i = 0; i < 3; i++){
+                                    output.println(maxStats[i]);
+                                    output.println(currentStats[i]);
+                                }
+                                output.println(money);
+                            } 
+                            catch (IOException e){
+                                System.out.println("The file doesn't exist");
                             }
+                            if (output!=null){output.close();}
                             break;
                     } //end of switch displayOption
 
                     break;
 
-                case "intructions":
+                case "instructions":
                 case "2": 
                     printInstructions();
                     break;
@@ -306,69 +330,93 @@ public class VirtualPet {
     }
     public static void interactions(){
         System.out.println("Interact with your pet!");
+        boolean exit = false;
+        while (!exit){
+        System.out.println();
         System.out.println("1. Feed your pet: ");
         System.out.println("2. Groom your pet: ");
         System.out.println("3. Play with your pet: ");
-        Scanner scanner = new Scanner(System.in);
+        System.out.println("4. Exit");
         int interact = scanner.nextInt();
-        if (interact == 1){
-            feedPet();
+        switch (interact){ 
+            case 1: 
+                feedPet();
+                break;          
+            case 2:
+                groomPet();
+                break;
+            case 3: 
+                playingPet();
+                break;
+            case 4: 
+                exit = true;
+                break;
+            default:
+                System.out.println("Bad choice!");    
+                break;
         }
-        if (interact == 2){
-            groomPet();
-        }
-        if (interact == 3){
-            playingPet();
-        }
+        System.out.println("The money left: " + money);
+    }
+     System.out.println("\nCurrent HEALTH: " + currentStats[0] + 
+", current FOOD: " + currentStats[1] + ", current ENERGY: " + currentStats[2]); 
     }
 
-    public static int playingPet(){
+    public static void playingPet(){
         //playing with your pet
         System.out.println("Buy your pet a toy!");
         if (money>0){
             money = money - 1; //subtract money used to buy the toy
-            maxStats[2] = maxStats[2] + 1; //increase the energy by 1 by buying pet a new toy
-            actions[0]++;
-            System.out.println("Energy increased to " + maxStats[2]); 
+            if (currentStats[2] < maxStats[2]){
+                currentStats[2] = currentStats[2] + 1; //increase the energy by 1 by buying pet a new toy
+                actions[0]++;
+                System.out.println("Energy increased to " + currentStats[2]); 
+            }
+            else {
+               System.out.println("The pet has the maximum energy. You do not have to play.");
+            }
         }
         else{
             System.out.println("There is not enough money to buy a toy.");
         }
-        return maxStats[2];
-        
     } //end of playingPet method
     
     
-    public static int feedPet(){
+    public static void feedPet(){
         //feeding pet
         System.out.println("Feed your pet!");
         if (money>0){
             money = money - 1;
-            maxStats[1] = maxStats[1] + 2; // increase the food given to pet
-            actions[1]++;
-            System.out.println("Food increased to " + maxStats[1] + ". They are less hungry now.");
-        } 
+            if (currentStats[1] < maxStats[1] - 1){
+                currentStats[1] = currentStats[1] + 2; // increase the food given to pet
+                actions[1]++;
+                System.out.println("Food increased to " + currentStats[1] + ". They are less hungry now.");
+            }
+            else{
+                System.out.println("The pet has the maximum food. You do not have to feed.");  
+            }
+        }
         else{
             System.out.println("There is not enough money to feed your pet.");
         }
-        return maxStats[1];
     } //end of feedPet method
 
-    public static int groomPet(){
+    public static void groomPet(){
         //grooming pet
         System.out.println("Groom your pet!");
         if (money>0){
             money = money - 1;
-            maxStats[0] = maxStats[0] + 2; //increase the max health
-            actions[2]++;
-            System.out.println("Health increased! Max health increased to: " + maxStats[0]);
+            if (currentStats[0]< maxStats[0]-1){
+                currentStats[0] = currentStats[0] + 2; //increase the max health
+                actions[2]++;
+                System.out.println("Health increased! Max health increased to: " + currentStats[0]);
+            }
+            else{
+                System.out.println("The pet reaches max health. You do not have to groom.");
+            }
         }
         else{
             System.out.println("There is not enough money to groom your pet.");
         }
-        return maxStats[0];
-        
-    
     } //end of groomPet
     
     public static void displayActions(){
@@ -382,7 +430,7 @@ public class VirtualPet {
             
         }
         if(actions[1] >= 5){
-            System.out.println("Congrations, you have earned the wholehearted eater achievement");
+            System.out.println("Congratulations, you have earned the wholehearted eater achievement");
             
         }
         if(actions[2] >= 5){
@@ -404,11 +452,11 @@ public class VirtualPet {
         
         //make sure that the sum of all three do not exceed pet stats 
         if (maxStats[0] + maxStats[1] + maxStats[2]> petStats){
-            currentStats[0] = Math.min(maxStats[0], petStats - 2);
-            currentStats[1] = Math.min(maxStats[1], petStats - maxStats[0] - 1); //make sure that (at least) two points are available for the other two stats
-            currentStats[2] = Math.min(maxStats[2], petStats - maxStats[0] - maxStats[1]); //make sure that (at least) one point is available for the other stat
+            maxStats[0] = Math.min(maxStats[0], petStats - 2);
+            maxStats[1] = Math.min(maxStats[1], petStats - maxStats[0] - 1); //make sure that (at least) two points are available for the other two stats
+            maxStats[2] = Math.min(maxStats[2], petStats - maxStats[0] - maxStats[1]); //make sure that (at least) one point is available for the other stat
         }//output results
-        System.out.println("\nMAX HEALTH: " + currentStats[0] + ", MAX FOOD: " + currentStats[1] + ", MAX ENERGY:  " + currentStats[2]); 
+        System.out.println("\nMAX HEALTH: " + maxStats[0] + ", MAX FOOD: " + maxStats[1] + ", MAX ENERGY:  " + maxStats[2]); 
     }
    
     
